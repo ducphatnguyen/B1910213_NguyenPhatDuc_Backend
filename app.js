@@ -1,6 +1,10 @@
 const express =  require("express");
 const cors = require("cors");
 const contactsRouter = require("./app/routes/contact.route");
+
+// 1
+const usersRouter = require("./app/routes/user.route");
+
 const ApiError = require("./app/api-error");
 
 const app = express();
@@ -10,6 +14,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
+
+// 2
+app.use("/api/users", usersRouter);
+
 // handle 404 response
 app.use((req, res, next) => {
     // Code ở đây sẽ chạy khi không có route được định nghĩa nào
