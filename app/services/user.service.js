@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const bcrypt = require('bcryptjs');
 
 class UserService {
@@ -6,7 +7,7 @@ class UserService {
     }
 
     //Định nghĩa các phương thức truy xuất CSDL sử dụng mongodb API
-    extractConactData(payload) {
+    extractUserData(payload) {
         const user = {
             email: payload.email,
             password: bcrypt.hashSync(payload.password, 8),
@@ -19,8 +20,8 @@ class UserService {
         return user;
     }
 
-    async create(payload) {
-        const user = this.extractConactData(payload);
+    async signUp(payload) {
+        const user = this.extractUserData(payload);
         const result = await this.User.insertOne(user);
         return result;
     }
@@ -30,7 +31,7 @@ class UserService {
         return user;
     }
 
-    async login(email, password) {
+    async signIn(email, password) {
         const user = await this.User.findOne({ email: email });
 
         if (!user) {
@@ -44,5 +45,24 @@ class UserService {
 
         return user;
     }
+
+    async addToken(userId, token) {
+        const result = await this.User.updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { token: token } }
+        );
+        return result.modifiedCount > 0;
+    }
+    
+    async deleteToken(userId, token) {
+        const result = await this.User.updateOne(
+            { _id: new ObjectId(userId), token: token },
+            { $unset: { token: 1 } }
+        );
+        return result.modifiedCount > 0;
+    }
+    
+      
+
 }
 module.exports = UserService;
